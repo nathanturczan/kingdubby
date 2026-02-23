@@ -1,0 +1,32 @@
+# Build artifacts
+Builds/MacOSX/build/
+Builds/MacOSX/DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+
+# JUCE generated
+JuceLibraryCode/
+
+# macOS
+.DS_Store
+*.dmg
+
+# IDE
+*.xcworkspace/
+
+# Temporary
+*.tmp
+*~
+
+# Private outreach/contact info
+outreach/
+RESEARCH.md
+
+# Original copyrighted binaries (archived locally only)
+KingDubby.component/
+King Dubby.dmg
+
+# Duplicate files at root
+/classicbg.png
+/dubbg.png
