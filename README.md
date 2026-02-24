@@ -1,10 +1,10 @@
 # KingDubby
 
-![KingDubby](Assets/kingdubbysplash.jpg)
+![KingDubby](assets/kingdubbysplash.jpg)
 
 A modern rebuild of the classic KingDubby dub delay plugin (Lowcoders & Bitplant, 2004–2008). The original stopped working when macOS dropped 32-bit support. This project recreates it for modern systems.
 
-![UI](Assets/screenshot.png)
+![UI](assets/screenshot.png)
 
 ## Download
 
