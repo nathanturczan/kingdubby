@@ -223,8 +223,9 @@ void DubDelay::setDelayTime(float timeValue, bool tempoSync, double bpm)
 
 void DubDelay::setFeedback(float fb)
 {
-    // 0-100 -> 0.0-1.1 (allow slight over-unity for self-oscillation)
-    feedback = fb / 100.0f * 1.1f;
+    // 0-100 -> 0.0-0.95 (capped below unity to prevent runaway)
+    // See: GitHub issue #3
+    feedback = fb / 100.0f * 0.95f;
 }
 
 void DubDelay::setDegradation(float degrad)
