@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 BUILD_DIR="$PROJECT_DIR/Builds/MacOSX/build/Release"
 INSTALLER_DIR="$SCRIPT_DIR"
-VERSION="1.0.0"
+VERSION="1.0.1"
 PKG_NAME="KingDubby-$VERSION-macOS"
 
 # Signing identities (from user's CLAUDE.md)
@@ -100,8 +100,8 @@ cat > "$INSTALLER_DIR/distribution.xml" << 'EOF'
         <pkg-ref id="com.ScaleNavigatorLLC.KingDubby.component"/>
     </choice>
 
-    <pkg-ref id="com.ScaleNavigatorLLC.KingDubby.vst3" version="1.0.0" onConclusion="none">KingDubby-VST3.pkg</pkg-ref>
-    <pkg-ref id="com.ScaleNavigatorLLC.KingDubby.component" version="1.0.0" onConclusion="none">KingDubby-AU.pkg</pkg-ref>
+    <pkg-ref id="com.ScaleNavigatorLLC.KingDubby.vst3" version="1.0.1" onConclusion="none">KingDubby-VST3.pkg</pkg-ref>
+    <pkg-ref id="com.ScaleNavigatorLLC.KingDubby.component" version="1.0.1" onConclusion="none">KingDubby-AU.pkg</pkg-ref>
 </installer-gui-script>
 EOF
 

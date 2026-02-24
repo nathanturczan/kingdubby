@@ -21,6 +21,6 @@
         <pkg-ref id="com.ScaleNavigatorLLC.KingDubby.component"/>
     </choice>
 
-    <pkg-ref id="com.ScaleNavigatorLLC.KingDubby.vst3" version="1.0.0" onConclusion="none">KingDubby-VST3.pkg</pkg-ref>
-    <pkg-ref id="com.ScaleNavigatorLLC.KingDubby.component" version="1.0.0" onConclusion="none">KingDubby-AU.pkg</pkg-ref>
+    <pkg-ref id="com.ScaleNavigatorLLC.KingDubby.vst3" version="1.0.1" onConclusion="none">KingDubby-VST3.pkg</pkg-ref>
+    <pkg-ref id="com.ScaleNavigatorLLC.KingDubby.component" version="1.0.1" onConclusion="none">KingDubby-AU.pkg</pkg-ref>
 </installer-gui-script>

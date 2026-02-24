@@ -294,11 +294,12 @@ void KingDubbyAudioProcessorEditor::resized()
 
 void KingDubbyAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
 {
-    // Build stamp - always visible (top left)
-    static constexpr const char* kBuildStamp = "KingDubby " __DATE__ " " __TIME__;
-    g.setColour(juce::Colours::white.withAlpha(0.7f));
-    g.setFont(10.0f);
-    g.drawText(kBuildStamp, 6, 4, getWidth() - 12, 14, juce::Justification::left);
+    // Build stamp - only shown in debug builds
+    // Uncomment for debugging:
+    // static constexpr const char* kBuildStamp = "KingDubby " __DATE__ " " __TIME__;
+    // g.setColour(juce::Colours::white.withAlpha(0.7f));
+    // g.setFont(10.0f);
+    // g.drawText(kBuildStamp, 6, 4, getWidth() - 12, 14, juce::Justification::left);
 
     // Debug overlays - only shown when kShowUiDebug is true
     if (kShowUiDebug && useLayoutMap)
