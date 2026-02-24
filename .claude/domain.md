@@ -3,20 +3,28 @@
 ## Feedback Loop Invariants
 
 ### INVARIANT: Feedback Write-Back Ceiling
-**Regardless of user params, the feedback write-back sample is limited to [-0.95, +0.95] after EQ/saturation.**
+**The value written back into the delay buffer from the feedback path is always bounded: `abs(feedbackWrite) <= FB_WRITE_LIMIT`.**
 
 This is the final safety net. It lives at the END of the feedback chain, right before writing to the delay buffer.
 
 ```cpp
-// AFTER softClip, BEFORE buffer write:
-feedbackL = std::clamp(feedbackL, -0.95f, 0.95f);  // CEILING
-feedbackR = std::clamp(feedbackR, -0.95f, 0.95f);
+static constexpr float FB_WRITE_LIMIT = 0.95f;
+
+// AFTER EQ stack, AFTER softClip, BEFORE buffer write:
+feedbackL = juce::jlimit(-FB_WRITE_LIMIT, FB_WRITE_LIMIT, feedbackL);
+feedbackR = juce::jlimit(-FB_WRITE_LIMIT, FB_WRITE_LIMIT, feedbackR);
 
 delayBufferL[wp] = dryL + feedbackL;
 delayBufferR[wp] = dryR + feedbackR;
 ```
 
-**Why 0.95?** Leaves headroom for dry signal addition while guaranteeing decay.
+**Why 0.95?** Leaves headroom for dry signal addition while guaranteeing decay. Exact number is taste, but the invariant is the real win.
+
+### How #3 and #5 Work Together
+- **#3 (parameter ceiling):** Caps feedback *coefficient* so knob can't exceed ~0.95 effective gain
+- **#5 (write-back ceiling):** Clamps the actual *signal* being written back, preventing spikes regardless of content
+
+Both are needed. #3 prevents over-unity gain. #5 catches anything that slips through (transients, filter resonance, etc).
 
 ---
 
@@ -28,26 +36,49 @@ delayBufferR[wp] = dryR + feedbackR;
 ├─────────────┼───────────────────────────────────────────────────┤
 │ DEGRADE     │ [optional] sample-hold + degradeLPF               │
 ├─────────────┼───────────────────────────────────────────────────┤
-│ HPF         │ ~80Hz, Q=0.707 - prevents bass buildup            │
-├─────────────┼───────────────────────────────────────────────────┤
 │ USER BPF    │ filterL1/R1 (user-controlled freq/BW)             │
 │             │ [optional] filterL2/R2 (24dB mode)                │
-├─────────────┼───────────────────────────────────────────────────┤
-│ LPF/SHELF   │ ~6-8kHz shelf or LPF - darkens repeats            │
 ├─────────────┼───────────────────────────────────────────────────┤
 │ CROSSFEED   │ ping-pong: crossL = filteredR * panRL             │
 ├─────────────┼───────────────────────────────────────────────────┤
 │ GAIN        │ (filtered + cross) * feedback                     │
 ├─────────────┼───────────────────────────────────────────────────┤
+│ EQ STACK    │ HPF (~80Hz) then LPF/shelf (~6-8kHz)              │
+│             │ Shape accumulated signal BEFORE saturation        │
+├─────────────┼───────────────────────────────────────────────────┤
 │ SOFTCLIP    │ tanh(x) - musical saturation                      │
 ├─────────────┼───────────────────────────────────────────────────┤
-│ CEILING     │ clamp(x, -0.95, +0.95) - INVARIANT                │
+│ CEILING     │ jlimit(-FB_WRITE_LIMIT, FB_WRITE_LIMIT, x)        │
+│             │ INVARIANT - final safety clamp                    │
 ├─────────────┼───────────────────────────────────────────────────┤
 │ WRITE       │ buffer[wp] = dryInput + feedbackL                 │
 └─────────────┴───────────────────────────────────────────────────┘
 ```
 
+**Why this order:**
+- EQ stack shapes the accumulated signal before saturation turns buildup into ugliness
+- tanh adds musical character
+- Hard ceiling guarantees stability and prevents last-mile spikes
+- Dry input goes into buffer even at low mix (common design, but makes stability fixes critical)
+
 **Do not reorder these stages.** The invariant (CEILING) must always be last before WRITE.
+
+---
+
+## Debug Logging (Once Per Init)
+
+Log these values once in `prepareToPlay()` or on param change, not per-sample:
+
+```cpp
+DBG("KingDubby DSP Config:");
+DBG("  FB_WRITE_LIMIT: " + String(FB_WRITE_LIMIT));
+DBG("  feedback coeff: " + String(feedback));
+DBG("  HPF cutoff: " + String(hpfCutoff) + " Hz");
+DBG("  LPF cutoff: " + String(lpfCutoff) + " Hz");
+DBG("  sample rate: " + String(sampleRate));
+```
+
+Makes it easy to confirm you're testing what you think you're testing.
 
 ---
 
