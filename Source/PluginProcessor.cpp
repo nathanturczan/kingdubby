@@ -213,8 +213,11 @@ void KingDubbyAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         }
     }
 
-    // Clear buffers when playback starts (stopped -> playing)
-    // This prevents old feedback from previous playback bleeding through
+    // Reset on transport start (stopped -> playing)
+    // Clears delay buffers AND all filter states to prevent:
+    // - Old feedback bleeding through
+    // - Ghost tones from filter state
+    // See: GitHub issue #7, domain.md
     if (isPlaying && !wasPlaying)
     {
         dubDelay.reset();

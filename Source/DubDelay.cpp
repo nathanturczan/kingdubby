@@ -36,10 +36,12 @@ void DubDelay::prepare(double sampleRate, int /*samplesPerBlock*/)
 
 void DubDelay::reset()
 {
+    // Clear delay buffers
     std::fill(delayBufferL.begin(), delayBufferL.end(), 0.0f);
     std::fill(delayBufferR.begin(), delayBufferR.end(), 0.0f);
     writePos = 0;
 
+    // Reset all filter states (prevents ghost tones)
     filterL1.reset();
     filterR1.reset();
     filterL2.reset();
@@ -47,8 +49,14 @@ void DubDelay::reset()
     degradeLPL.reset();
     degradeLPR.reset();
 
+    // Reset degradation state
     holdL = holdR = 0.0f;
     holdCounter = 0;
+
+    // Sync delay time (avoid smoothing zipper on restart)
+    delayTimeSamples = targetDelayTimeSamples;
+
+    DBG("DubDelay::reset() - buffers and filters cleared");
 }
 
 void DubDelay::process(juce::AudioBuffer<float>& buffer)
