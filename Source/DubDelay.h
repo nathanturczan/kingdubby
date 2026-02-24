@@ -70,6 +70,11 @@ private:
     // Degradation lowpass (simulates PT2399 bandwidth reduction)
     juce::dsp::StateVariableTPTFilter<float> degradeLPL, degradeLPR;
 
+    // Feedback-path LPF (darkens repeats, prevents harsh buildup)
+    // See: GitHub issue #4, domain.md
+    juce::dsp::StateVariableTPTFilter<float> feedbackLPL, feedbackLPR;
+    static constexpr float FEEDBACK_LPF_FREQ = 8000.0f;  // Hz
+
     // Sample-and-hold for degradation (sample rate reduction)
     float holdL = 0.0f, holdR = 0.0f;
     int holdCounter = 0;

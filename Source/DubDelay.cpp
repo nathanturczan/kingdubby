@@ -12,6 +12,12 @@ DubDelay::DubDelay()
     // Degradation lowpass
     degradeLPL.setType(juce::dsp::StateVariableTPTFilterType::lowpass);
     degradeLPR.setType(juce::dsp::StateVariableTPTFilterType::lowpass);
+
+    // Feedback-path LPF (darkens repeats - issue #4)
+    feedbackLPL.setType(juce::dsp::StateVariableTPTFilterType::lowpass);
+    feedbackLPR.setType(juce::dsp::StateVariableTPTFilterType::lowpass);
+    feedbackLPL.setCutoffFrequency(FEEDBACK_LPF_FREQ);
+    feedbackLPR.setCutoffFrequency(FEEDBACK_LPF_FREQ);
 }
 
 void DubDelay::prepare(double sampleRate, int /*samplesPerBlock*/)
@@ -30,6 +36,13 @@ void DubDelay::prepare(double sampleRate, int /*samplesPerBlock*/)
     filterR2.prepare(spec);
     degradeLPL.prepare(spec);
     degradeLPR.prepare(spec);
+    feedbackLPL.prepare(spec);
+    feedbackLPR.prepare(spec);
+
+    // Log DSP config (once per init - see domain.md)
+    DBG("DubDelay::prepare() - sampleRate=" + juce::String(sampleRate)
+        + " FB_WRITE_LIMIT=" + juce::String(FB_WRITE_LIMIT)
+        + " FEEDBACK_LPF_FREQ=" + juce::String(FEEDBACK_LPF_FREQ));
 
     reset();
 }
@@ -48,6 +61,8 @@ void DubDelay::reset()
     filterR2.reset();
     degradeLPL.reset();
     degradeLPR.reset();
+    feedbackLPL.reset();
+    feedbackLPR.reset();
 
     // Reset degradation state
     holdL = holdR = 0.0f;
@@ -120,6 +135,11 @@ void DubDelay::process(juce::AudioBuffer<float>& buffer)
         // GAIN
         float feedbackL = (filteredL + crossL) * feedback;
         float feedbackR = (filteredR + crossR) * feedback;
+
+        // EQ STACK - LPF (darkens repeats, prevents harsh buildup)
+        // See: GitHub issue #4, domain.md
+        feedbackL = feedbackLPL.processSample(0, feedbackL);
+        feedbackR = feedbackLPR.processSample(0, feedbackR);
 
         // SOFTCLIP (musical saturation)
         feedbackL = softClip(feedbackL);
