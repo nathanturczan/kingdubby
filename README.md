@@ -4,11 +4,11 @@
 
 A modern rebuild of the classic KingDubby dub delay plugin (Lowcoders & Bitplant, 2004–2008). The original stopped working when macOS dropped 32-bit support. This project recreates it for modern systems.
 
-![UI](Assets/kingdubby_dubbg.png)
+![UI](Assets/screenshot.png)
 
 ## Download
 
-**[Releases](https://github.com/soney/KingDubby/releases)** — macOS (AU/VST3), Windows (VST3)
+**[Releases](https://github.com/nathanturczan/kingdubby/releases)** — macOS (AU/VST3), Windows (VST3)
 
 ## Features
 
