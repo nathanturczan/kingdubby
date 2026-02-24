@@ -346,8 +346,9 @@ void KingDubbyAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
         drawCross("MIX", juce::Colours::springgreen, *mixKnob);
     }
 
-    // Footer: "revived in 2026 by Scale Navigator"
-    // "Scale Navigator" is highlighted and clickable
+    // Footer disabled for now
+    // TODO: Re-enable when DSP is refined
+    /*
     const auto area = getLocalBounds();
     const juce::String prefixText = "revived in 2026 by ";
     const juce::String linkText = "Scale Navigator";
@@ -364,16 +365,15 @@ void KingDubbyAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
     const int startX = area.getRight() - totalWidth - pad;
     const int textY = area.getBottom() - textHeight - pad;
 
-    // Draw prefix in dimmer white
     g.setColour(juce::Colours::white.withAlpha(0.4f));
     g.drawText(prefixText, startX, textY, prefixWidth, textHeight, juce::Justification::left, false);
 
-    // Draw "Scale Navigator" in a brighter/accent color (golden yellow)
-    g.setColour(juce::Colour(0xFF, 0xD7, 0x00).withAlpha(0.85f));  // Gold
+    g.setColour(juce::Colour(0xFF, 0xD7, 0x00).withAlpha(0.85f));
     g.drawText(linkText, startX + prefixWidth, textY, linkWidth, textHeight, juce::Justification::left, false);
 
-    // Only the "Scale Navigator" part is clickable
     footerBounds = juce::Rectangle<int>(startX + prefixWidth, textY, linkWidth, textHeight);
+    */
+    footerBounds = juce::Rectangle<int>();  // Empty bounds, no clickable area
 }
 
 void KingDubbyAudioProcessorEditor::mouseUp(const juce::MouseEvent& e)
