@@ -173,11 +173,22 @@ void KingDubbyAudioProcessor::changeProgramName(int /*index*/, const juce::Strin
 void KingDubbyAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     dubDelay.prepare(sampleRate, samplesPerBlock);
+    needsResetOnNextProcess.store(true);  // Ensure clean start
 }
 
 void KingDubbyAudioProcessor::releaseResources()
 {
     dubDelay.reset();
+    needsResetOnNextProcess.store(true);  // Reset on next processBlock after resume
+}
+
+void KingDubbyAudioProcessor::processBlockBypassed(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+{
+    // When host bypasses us, flag for reset when processing resumes
+    needsResetOnNextProcess.store(true);
+
+    // Pass through audio unchanged (default behavior)
+    juce::AudioProcessor::processBlockBypassed(buffer, midiMessages);
 }
 
 bool KingDubbyAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
@@ -198,6 +209,13 @@ void KingDubbyAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 {
     juce::ScopedNoDenormals noDenormals;
 
+    // Wall-clock gap detection (Ableton device on/off, see issue #16)
+    // If >GAP_THRESHOLD_MS passed since last processBlock, we were suspended
+    const juce::uint32 now = juce::Time::getMillisecondCounter();
+    const juce::uint32 elapsed = now - lastProcessTimeMs;
+    const bool wallClockGap = (lastProcessTimeMs != 0) && (elapsed > GAP_THRESHOLD_MS);
+    lastProcessTimeMs = now;
+
     // Get host transport state
     double bpm = 120.0;
     bool isPlaying = false;
@@ -213,16 +231,20 @@ void KingDubbyAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         }
     }
 
-    // Reset on transport start (stopped -> playing)
-    // Clears delay buffers AND all filter states to prevent:
-    // - Old feedback bleeding through
-    // - Ghost tones from filter state
-    // See: GitHub issue #7, domain.md
-    if (isPlaying && !wasPlaying)
+    // Reset on: lifecycle flag OR wall-clock gap OR transport start
+    bool shouldReset = needsResetOnNextProcess.exchange(false)
+                    || wallClockGap
+                    || (isPlaying && !wasPlaying);
+    wasPlaying = isPlaying;
+
+    if (shouldReset)
     {
         dubDelay.reset();
+        buffer.clear();  // Output silence to prevent pop
+        DBG("KingDubby: reset (wallClockGap=" + juce::String(wallClockGap ? 1 : 0)
+            + " elapsed=" + juce::String(elapsed) + "ms)");
+        return;
     }
-    wasPlaying = isPlaying;
 
     // Update delay parameters
     dubDelay.setDelayTime(timeParam->load(), true, bpm);

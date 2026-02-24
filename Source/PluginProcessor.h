@@ -15,6 +15,7 @@ public:
     bool isBusesLayoutSupported(const BusesLayout& layouts) const override;
 
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void processBlockBypassed(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
@@ -70,7 +71,9 @@ private:
 
     // State tracking for buffer clearing
     bool wasPlaying = false;
-    bool wasBypassed = false;
+    std::atomic<bool> needsResetOnNextProcess { true };  // Thread-safe reset flag
+    juce::uint32 lastProcessTimeMs = 0;  // Wall-clock time of last processBlock (for gap detection)
+    static constexpr juce::uint32 GAP_THRESHOLD_MS = 150;  // Reset if gap > this (Ableton device on/off)
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(KingDubbyAudioProcessor)
 };

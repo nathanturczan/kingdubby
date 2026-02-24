@@ -43,10 +43,10 @@ Both are needed. #3 prevents over-unity gain. #5 catches anything that slips thr
 ├─────────────┼───────────────────────────────────────────────────┤
 │ GAIN        │ (filtered + cross) * feedback                     │
 ├─────────────┼───────────────────────────────────────────────────┤
-│ EQ STACK    │ HPF (~80Hz) then LPF/shelf (~6-8kHz)              │
-│             │ Shape accumulated signal BEFORE saturation        │
+│ SOFTCLIP    │ tanh(x) - generates HF edge harmonics             │
 ├─────────────┼───────────────────────────────────────────────────┤
-│ SOFTCLIP    │ tanh(x) - musical saturation                      │
+│ LPF         │ ~6kHz lowpass - removes edge harmonics from clip  │
+│             │ MUST be after softclip to catch saturation HF     │
 ├─────────────┼───────────────────────────────────────────────────┤
 │ CEILING     │ jlimit(-FB_WRITE_LIMIT, FB_WRITE_LIMIT, x)        │
 │             │ INVARIANT - final safety clamp                    │
@@ -55,11 +55,16 @@ Both are needed. #3 prevents over-unity gain. #5 catches anything that slips thr
 └─────────────┴───────────────────────────────────────────────────┘
 ```
 
+**Why LPF after softclip:**
+- Saturation (tanh) generates high-frequency edge harmonics
+- LPF after softclip removes these nasties before re-injection
+- This is the standard "analog engineer" move
+
 **Why this order:**
-- EQ stack shapes the accumulated signal before saturation turns buildup into ugliness
-- tanh adds musical character
-- Hard ceiling guarantees stability and prevents last-mile spikes
-- Dry input goes into buffer even at low mix (common design, but makes stability fixes critical)
+- Softclip adds musical character but creates HF
+- LPF catches the HF before it accumulates in the loop
+- Hard ceiling guarantees stability
+- Dry input goes into buffer even at low mix (makes stability fixes critical)
 
 **Do not reorder these stages.** The invariant (CEILING) must always be last before WRITE.
 
@@ -84,12 +89,26 @@ Makes it easy to confirm you're testing what you think you're testing.
 
 ## Reset Events
 
+**Invariant:** Any time the plugin stops being processed for >150ms, the first resumed block clears the delay line and outputs silence.
+
 Call `reset()` (clear buffers + filter state) on:
-1. `prepareToPlay()`
-2. Transport stopped→playing transition
-3. Plugin un-bypassed (if detectable)
+1. `prepareToPlay()` - sets `needsResetOnNextProcess = true`
+2. Transport stopped→playing transition (in processBlock)
+3. `releaseResources()` - sets `needsResetOnNextProcess = true`
+4. `processBlockBypassed()` - sets `needsResetOnNextProcess = true`
+5. **Wall-clock gap detection** - if >150ms elapsed since last processBlock
+6. First `processBlock()` after any reset trigger
 
 This prevents ghost feedback and makes A/B testing reliable.
+
+**Why wall-clock (GitHub #16):** Ableton's device activator (yellow button) suspends processing
+WITHOUT calling any lifecycle methods. It just stops calling `processBlock()`, then resumes later.
+The only reliable detection is wall-clock time - Live can't hide the fact that real time passed.
+
+**What doesn't work:**
+- `suspendProcessing()` - not virtual in JUCE 8
+- Lifecycle callbacks - Ableton doesn't call them for device activator
+- Playhead discontinuity - returns invalid/unavailable in this context
 
 ---
 

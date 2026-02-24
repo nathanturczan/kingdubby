@@ -136,14 +136,14 @@ void DubDelay::process(juce::AudioBuffer<float>& buffer)
         float feedbackL = (filteredL + crossL) * feedback;
         float feedbackR = (filteredR + crossR) * feedback;
 
-        // EQ STACK - LPF (darkens repeats, prevents harsh buildup)
+        // SOFTCLIP (musical saturation - generates HF harmonics)
+        feedbackL = softClip(feedbackL);
+        feedbackR = softClip(feedbackR);
+
+        // LPF (after softclip! removes edge harmonics before re-injection)
         // See: GitHub issue #4, domain.md
         feedbackL = feedbackLPL.processSample(0, feedbackL);
         feedbackR = feedbackLPR.processSample(0, feedbackR);
-
-        // SOFTCLIP (musical saturation)
-        feedbackL = softClip(feedbackL);
-        feedbackR = softClip(feedbackR);
 
         // CEILING (invariant - see domain.md, GitHub #5)
         // Clamp feedback only, not dry input - preserves transients
