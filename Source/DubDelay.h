@@ -37,6 +37,10 @@ public:
 private:
     // Delay buffers
     static constexpr int MAX_DELAY_SAMPLES = 192000 * 4;  // 4 seconds at 192kHz
+
+    // Feedback write-back ceiling (invariant - see domain.md)
+    // Guarantees stability regardless of EQ/saturation behavior
+    static constexpr float FB_WRITE_LIMIT = 0.95f;
     std::array<float, MAX_DELAY_SAMPLES> delayBufferL{};
     std::array<float, MAX_DELAY_SAMPLES> delayBufferR{};
     int writePos = 0;

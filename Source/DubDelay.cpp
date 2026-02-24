@@ -109,9 +109,18 @@ void DubDelay::process(juce::AudioBuffer<float>& buffer)
         float crossL = filteredR * panRL;
         float crossR = filteredL * panLR;
 
-        // Soft clip the feedback
-        float feedbackL = softClip((filteredL + crossL) * feedback);
-        float feedbackR = softClip((filteredR + crossR) * feedback);
+        // GAIN
+        float feedbackL = (filteredL + crossL) * feedback;
+        float feedbackR = (filteredR + crossR) * feedback;
+
+        // SOFTCLIP (musical saturation)
+        feedbackL = softClip(feedbackL);
+        feedbackR = softClip(feedbackR);
+
+        // CEILING (invariant - see domain.md, GitHub #5)
+        // Clamp feedback only, not dry input - preserves transients
+        feedbackL = juce::jlimit(-FB_WRITE_LIMIT, FB_WRITE_LIMIT, feedbackL);
+        feedbackR = juce::jlimit(-FB_WRITE_LIMIT, FB_WRITE_LIMIT, feedbackR);
 
         // Get dry input
         float dryL = leftChannel[i];
