@@ -125,6 +125,7 @@
 		8EAEA9355CDE8813E63B89E2 /* kingdubby_classicbg.png */ /* kingdubby_classicbg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = kingdubby_classicbg.png; path = ../../assets/kingdubby_classicbg.png; sourceTree = SOURCE_ROOT; };
 		8FA483F90F8189F3E6FAF706 /* include_juce_audio_processors_headless.mm */ /* include_juce_audio_processors_headless.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_audio_processors_headless.mm; path = ../../JuceLibraryCode/include_juce_audio_processors_headless.mm; sourceTree = SOURCE_ROOT; };
 		9300CF9A8CFC6A253BECD80F /* RecentFilesMenuTemplate.nib */ /* RecentFilesMenuTemplate.nib */ = {isa = PBXFileReference; lastKnownFileType = file.nib; name = RecentFilesMenuTemplate.nib; path = RecentFilesMenuTemplate.nib; sourceTree = SOURCE_ROOT; };
+		9E1F7CD1C115645D202B9B7D /* LayoutMap.h */ /* LayoutMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LayoutMap.h; path = ../../Source/LayoutMap.h; sourceTree = SOURCE_ROOT; };
 		9FB06483D0F9774F9CABF324 /* DubDelay.h */ /* DubDelay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DubDelay.h; path = ../../Source/DubDelay.h; sourceTree = SOURCE_ROOT; };
 		A3348AF4EFE0D2A64E445F59 /* CoreMIDI.framework */ /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
 		A7528AFFB32ADC0B403AEA46 /* include_juce_audio_basics.mm */ /* include_juce_audio_basics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_audio_basics.mm; path = ../../JuceLibraryCode/include_juce_audio_basics.mm; sourceTree = SOURCE_ROOT; };
@@ -141,6 +142,7 @@
 		D550AF84CFE2CAF0ECC93D69 /* VST3 */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KingDubby.vst3; sourceTree = BUILT_PRODUCTS_DIR; };
 		D71BEAAB44BA6B9C434FCF95 /* AU */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KingDubby.component; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA36450D6FA8BD128EFBA99F /* VST3 Manifest Helper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = juce_vst3_helper; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBC9A2A2B95C317D38A118D1 /* kingdubby_layout_map.png */ /* kingdubby_layout_map.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = kingdubby_layout_map.png; path = ../../assets/kingdubby_layout_map.png; sourceTree = SOURCE_ROOT; };
 		E0ED480B374F20B5310AE5FF /* kingdubby_bigdial.png */ /* kingdubby_bigdial.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = kingdubby_bigdial.png; path = ../../assets/kingdubby_bigdial.png; sourceTree = SOURCE_ROOT; };
 		E29473790791A7C71846266D /* PluginEditor.cpp */ /* PluginEditor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PluginEditor.cpp; path = ../../Source/PluginEditor.cpp; sourceTree = SOURCE_ROOT; };
 		E614AB800AF390F3B528410F /* include_juce_audio_plugin_client_VST3.mm */ /* include_juce_audio_plugin_client_VST3.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_audio_plugin_client_VST3.mm; path = ../../JuceLibraryCode/include_juce_audio_plugin_client_VST3.mm; sourceTree = SOURCE_ROOT; };
@@ -306,6 +308,7 @@
 				E0ED480B374F20B5310AE5FF,
 				EF6AF4188CF55BAA3BA4D0D0,
 				2D27EB654B5A285B8D38F099,
+				DBC9A2A2B95C317D38A118D1,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -344,6 +347,7 @@
 				D4C42117C77ED42576690B07,
 				9FB06483D0F9774F9CABF324,
 				6C86254BB9E7314800997C8B,
+				9E1F7CD1C115645D202B9B7D,
 			);
 			name = Source;
 			sourceTree = "<group>";

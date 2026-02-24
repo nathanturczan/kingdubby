@@ -198,16 +198,28 @@ void KingDubbyAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 {
     juce::ScopedNoDenormals noDenormals;
 
-    // Get host BPM
+    // Get host transport state
     double bpm = 120.0;
+    bool isPlaying = false;
+
     if (auto* playHead = getPlayHead())
     {
         if (auto posInfo = playHead->getPosition())
         {
             if (posInfo->getBpm().hasValue())
                 bpm = *posInfo->getBpm();
+            if (posInfo->getIsPlaying())
+                isPlaying = true;
         }
     }
+
+    // Clear buffers when playback starts (stopped -> playing)
+    // This prevents old feedback from previous playback bleeding through
+    if (isPlaying && !wasPlaying)
+    {
+        dubDelay.reset();
+    }
+    wasPlaying = isPlaying;
 
     // Update delay parameters
     dubDelay.setDelayTime(timeParam->load(), true, bpm);

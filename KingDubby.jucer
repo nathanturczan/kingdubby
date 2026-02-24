@@ -18,6 +18,7 @@
       <FILE id="filmH" name="FilmstripKnob.h" compile="0" resource="0" file="Source/FilmstripKnob.h"/>
       <FILE id="dspH" name="DubDelay.h" compile="0" resource="0" file="Source/DubDelay.h"/>
       <FILE id="dspC" name="DubDelay.cpp" compile="1" resource="0" file="Source/DubDelay.cpp"/>
+      <FILE id="layoutH" name="LayoutMap.h" compile="0" resource="0" file="Source/LayoutMap.h"/>
     </GROUP>
     <GROUP id="{75105213-5EC5-D60C-C143-1CB3A4BB6630}" name="Resources">
       <FILE id="bgClassic" name="kingdubby_classicbg.png" compile="0" resource="1"
@@ -30,6 +31,8 @@
             file="assets/kingdubby_smalldial.png"/>
       <FILE id="filterSw" name="kingdubby_filterswitch.png" compile="0" resource="1"
             file="assets/kingdubby_filterswitch.png"/>
+      <FILE id="layoutMap" name="kingdubby_layout_map.png" compile="0" resource="1"
+            file="assets/kingdubby_layout_map.png"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
@@ -58,6 +61,27 @@
         <MODULEPATH id="juce_audio_processors_headless" path="../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
+    <VS2022 targetFolder="Builds/VisualStudio2022">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="KingDubby"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="KingDubby"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2022>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

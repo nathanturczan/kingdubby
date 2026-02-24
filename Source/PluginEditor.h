@@ -4,6 +4,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginProcessor.h"
 #include "FilmstripKnob.h"
+#include "LayoutMap.h"
 
 class KingDubbyAudioProcessorEditor : public juce::AudioProcessorEditor
 {
@@ -13,6 +14,9 @@ public:
 
     void paint(juce::Graphics&) override;
     void resized() override;
+    void paintOverChildren(juce::Graphics&) override;
+    void mouseUp(const juce::MouseEvent&) override;
+    void mouseMove(const juce::MouseEvent&) override;
 
 private:
     KingDubbyAudioProcessor& audioProcessor;
@@ -27,9 +31,11 @@ private:
     juce::Image knobSmallFilmstrip;
     juce::Image filterSwitchFilmstrip;
 
-    // Number of frames in filmstrips
-    static constexpr int BIG_KNOB_FRAMES = 57;
-    static constexpr int SMALL_KNOB_FRAMES = 58;
+    // Filmstrip frame counts - calculated from image dimensions
+    // Big dial: 54x3060, 3060/60 = 51px per frame (60 frames)
+    // Small dial: 38x2193, 2193/51 = 43px per frame (51 frames)
+    static constexpr int BIG_KNOB_FRAMES = 60;
+    static constexpr int SMALL_KNOB_FRAMES = 51;
 
     // Knobs - DELAY section
     std::unique_ptr<FilmstripKnob> timeKnob;
@@ -62,6 +68,16 @@ private:
     void loadImages();
     void createKnobs();
     void attachParameters();
+    void setupLayoutMap();
+
+    // Layout map for precise knob positioning
+    LayoutMap layoutMap;
+    bool useLayoutMap = false;
+    juce::Rectangle<int> bgRect;      // Stores actual background draw rect for consistent placement
+    juce::Rectangle<int> footerBounds; // Clickable footer area
+
+    // Debug flag - set to true only when debugging UI positioning
+    static constexpr bool kShowUiDebug = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(KingDubbyAudioProcessorEditor)
 };

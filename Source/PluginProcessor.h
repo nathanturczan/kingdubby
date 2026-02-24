@@ -68,5 +68,9 @@ private:
     std::atomic<float>* panRLParam = nullptr;
     std::atomic<float>* mixParam = nullptr;
 
+    // State tracking for buffer clearing
+    bool wasPlaying = false;
+    bool wasBypassed = false;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(KingDubbyAudioProcessor)
 };

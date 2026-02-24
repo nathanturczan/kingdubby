@@ -30,3 +30,12 @@ King Dubby.dmg
 # Duplicate files at root
 /classicbg.png
 /dubbg.png
+
+# Built installers (distribute via GitHub Releases)
+installers/*.pkg
+installers/*.exe
+installers/staging/
+
+# Windows build artifacts
+Builds/VisualStudio2022/x64/
+Builds/VisualStudio2022/*.user
