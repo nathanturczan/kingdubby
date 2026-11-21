@@ -61,7 +61,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout KingDubbyAudioProcessor::cre
         juce::ParameterID(PARAM_DEGRAD, 1),
         "Degradation",
         juce::NormalisableRange<float>(0.0f, 100.0f, 0.1f),
-        0.0f
+        10.0f  // Original default: mostly clean repeats with a little filter
     ));
 
     // FILTER TYPE: 12/24 dB (bool)
@@ -76,15 +76,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout KingDubbyAudioProcessor::cre
         juce::ParameterID(PARAM_FILTER_FREQ, 1),
         "Filter Frequency",
         juce::NormalisableRange<float>(300.0f, 3000.0f, 1.0f, 0.5f),  // Skewed
-        1000.0f
+        800.0f  // Original default
     ));
 
-    // FILTER BANDWIDTH: 0.0-4.0
+    // FILTER BANDWIDTH: 0.0-4.0 octaves (the engine floors it at 0.01)
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(PARAM_FILTER_BW, 1),
         "Filter Bandwidth",
         juce::NormalisableRange<float>(0.0f, 4.0f, 0.01f),
-        2.0f
+        1.0f  // Original default
     ));
 
     // GAIN: -12 to +12 dB
@@ -144,7 +144,7 @@ bool KingDubbyAudioProcessor::isMidiEffect() const
 
 double KingDubbyAudioProcessor::getTailLengthSeconds() const
 {
-    return 4.0;  // Max delay time
+    return DubDelay::MAX_DELAY_SECONDS;
 }
 
 int KingDubbyAudioProcessor::getNumPrograms()
@@ -170,9 +170,10 @@ void KingDubbyAudioProcessor::changeProgramName(int /*index*/, const juce::Strin
 {
 }
 
-void KingDubbyAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
+void KingDubbyAudioProcessor::prepareToPlay(double sampleRate, int /*samplesPerBlock*/)
 {
-    dubDelay.prepare(sampleRate, samplesPerBlock);
+    dubDelay.prepare(sampleRate);
+    lastProcessTimeMs = 0;
     needsResetOnNextProcess.store(true);  // Ensure clean start
 }
 
@@ -209,11 +210,16 @@ void KingDubbyAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 {
     juce::ScopedNoDenormals noDenormals;
 
-    // Wall-clock gap detection (Ableton device on/off, see issue #16)
-    // If >GAP_THRESHOLD_MS passed since last processBlock, we were suspended
+    // Wall-clock gap detection (Ableton device on/off, see issue #16).
+    // Live stops calling processBlock without any lifecycle callback, so a long
+    // gap is the only sign we were switched off. Offline renders are exempt:
+    // their blocks have no relation to real time, and a slow export must not
+    // wipe the tail.
     const juce::uint32 now = juce::Time::getMillisecondCounter();
     const juce::uint32 elapsed = now - lastProcessTimeMs;
-    const bool wallClockGap = (lastProcessTimeMs != 0) && (elapsed > GAP_THRESHOLD_MS);
+    const bool wallClockGap = ! isNonRealtime()
+                           && (lastProcessTimeMs != 0)
+                           && (elapsed > GAP_THRESHOLD_MS);
     lastProcessTimeMs = now;
 
     // Get host transport state
@@ -237,14 +243,10 @@ void KingDubbyAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
                     || (isPlaying && !wasPlaying);
     wasPlaying = isPlaying;
 
+    // A reset only empties the delay line. The block is still processed, so
+    // the dry signal is never interrupted.
     if (shouldReset)
-    {
         dubDelay.reset();
-        buffer.clear();  // Output silence to prevent pop
-        DBG("KingDubby: reset (wallClockGap=" + juce::String(wallClockGap ? 1 : 0)
-            + " elapsed=" + juce::String(elapsed) + "ms)");
-        return;
-    }
 
     // Update delay parameters
     dubDelay.setDelayTime(timeParam->load(), true, bpm);
@@ -259,7 +261,13 @@ void KingDubbyAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     dubDelay.setMix(mixParam->load());
 
     // Process audio
-    dubDelay.process(buffer);
+    const int numChannels = buffer.getNumChannels();
+    if (numChannels < 1)
+        return;
+
+    dubDelay.process(buffer.getWritePointer(0),
+                     numChannels > 1 ? buffer.getWritePointer(1) : nullptr,
+                     buffer.getNumSamples());
 }
 
 bool KingDubbyAudioProcessor::hasEditor() const
