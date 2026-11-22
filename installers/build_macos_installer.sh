@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 BUILD_DIR="$PROJECT_DIR/Builds/MacOSX/build/Release"
 INSTALLER_DIR="$SCRIPT_DIR"
-VERSION="1.0.1"
+VERSION="1.0.2"
 PKG_NAME="KingDubby-$VERSION-macOS"
 
 # Signing identities (from user's CLAUDE.md)

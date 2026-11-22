@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="kD2024" name="KingDubby" useAppConfig="0" addUsingNamespaceToJuceHeader="0"
               displaySplashScreen="0" jucerFormatVersion="1" pluginFormats="buildAU,buildVST3"
-              pluginName="KingDubby" pluginDesc="Dub tape delay - recreation of the classic Lowcoders plugin"
+              version="1.0.2" pluginName="KingDubby" pluginDesc="Dub tape delay - recreation of the classic Lowcoders plugin"
               pluginManufacturer="Scale Navigator LLC" aaxIdentifier="com.ScaleNavigatorLLC.KingDubby"
               bundleIdentifier="com.ScaleNavigatorLLC.KingDubby" pluginAUMainType="'aufx'"
               projectType="audioplug" companyWebsite="https://scalenavigator.com"

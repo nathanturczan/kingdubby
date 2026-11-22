@@ -18,13 +18,13 @@
 # CUSTOMIZE THESE FOR YOUR PLUGIN
 # ============================================
 PLUGIN_NAME="${PLUGIN_NAME:-KingDubby}"
-VERSION="${VERSION:-1.0.0}"
+VERSION="${VERSION:-1.0.2}"
 EXPECTED_MINOS="${EXPECTED_MINOS:-11.0}"
 
 # String that must appear inside the binary to prove THIS build is
 # installed (e.g. a version label compiled into the UI). Leave empty
 # to skip the check.
-VERSION_STRING="${VERSION_STRING:-}"
+VERSION_STRING="${VERSION_STRING:-KingDubby v$VERSION}"
 
 # Source directory for the staleness check (binary must be newer than
 # every .cpp/.h under here). Leave empty to skip.

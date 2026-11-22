@@ -2,7 +2,7 @@
 ; Requires Inno Setup 6.x - https://jrsoftware.org/isinfo.php
 
 #define MyAppName "KingDubby"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.2"
 #define MyAppPublisher "Scale Navigator LLC"
 #define MyAppURL "https://scalenavigator.com"
 
